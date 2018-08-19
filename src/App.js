@@ -11,7 +11,7 @@ class App extends Component {
     this.backend = process.env.REACT_APP_BACKEND_URL;
     this.state = {
       zip: '',
-      weather: ''
+      temp: ''
     };
   }
 
@@ -24,11 +24,21 @@ class App extends Component {
     axios
       .get(this.backend + '/?zip=' + this.state.zip)
       .then((result) => {
-        console.log(result.data);
+        this.setState({temp: result.data.temp});
       })
       .catch((e) => {
         alert(e);
       });
+  }
+
+  temp(){
+    if (this.state.temp) {
+      return (
+        <p>
+          <strong>The temperature is {this.state.temp} degrees</strong>
+        </p>
+      )
+    }
   }
 
   render() {
@@ -46,6 +56,7 @@ class App extends Component {
           <br/><br/>
           <input type="submit"/>
         </form>
+        {this.temp()}
       </div>
     );
   }
