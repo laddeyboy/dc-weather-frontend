@@ -1,18 +1,17 @@
 import React, { Component } from 'react';
+import { connect } from 'react-redux';
 import logo from './logo.svg';
 import './App.css';
+import { setTempAsync } from './actions.js';
 
-import axios from 'axios';
+import { Provider } from 'react-redux';
+import store from './store.js';
 
 class App extends Component {
   constructor(props) {
     super(props);
 
-    this.backend = process.env.REACT_APP_BACKEND_URL;
-    this.state = {
-      zip: '',
-      temp: ''
-    };
+    this.state = {zip: ''};
   }
 
   update_zip(event) {
@@ -21,21 +20,14 @@ class App extends Component {
 
   lookup(event) {
     event.preventDefault();
-    axios
-      .get(this.backend + '/?zip=' + this.state.zip)
-      .then((result) => {
-        this.setState({temp: result.data.temp});
-      })
-      .catch((e) => {
-        alert(e);
-      });
+    this.props.onSubmit(this.state.zip);
   }
 
   temp(){
-    if (this.state.temp) {
+    if (this.props.temp) {
       return (
         <p>
-          <strong>The temperature is {this.state.temp} degrees</strong>
+          <strong>The temperature is {this.props.temp} degrees</strong>
         </p>
       )
     }
@@ -62,4 +54,28 @@ class App extends Component {
   }
 }
 
-export default App;
+function mapStateToProps (state) {
+  return {
+    temp: state.temp
+  }
+}
+
+function mapDispatchToProps (dispatch) {
+  return {
+    onSubmit: function (data) {
+      dispatch(setTempAsync(data))
+    }
+  }
+}
+
+var ConnectedApp = connect(mapStateToProps, mapDispatchToProps)(App);
+
+function AppWrapper () {
+  return (
+    <Provider store={store}>
+      <ConnectedApp/>
+    </Provider>
+  )
+}
+
+export default AppWrapper;
